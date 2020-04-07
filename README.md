@@ -2,7 +2,7 @@
 
 ## todo-grabber.py:
 
-Search for all todo's (ex. 'TODO') from the specified files types in the current directory, or any directory if supplied in the arguments.
+Search for all todo's (ex. 'TODO') from the specified file types in the current directory, or any directory if supplied in the arguments.
 
 Python 3:  
 - [os module](https://docs.python.org/3/library/os.html)
