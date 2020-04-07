@@ -6,12 +6,13 @@ import sys
 file_types = ['.py', '.txt', '.md']
 
 # check the provided args for a directory
-if len(sys.argv) > 2:
-    print('Error! Too many arguments.')
-    exit()
-elif len(sys.argv) == 2:
+if len(sys.argv) > 1:
     # if directory provided set it to path
-    path = sys.argv[1]
+    if os.path.isdir(sys.argv[1]):
+        path = sys.argv[1]
+    else:
+        print('Error! Please provide a path or no arguments at all')
+        exit()
 else:
     # if not directory provided set it to cwd
     path = os.getcwd()
