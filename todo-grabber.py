@@ -1,21 +1,35 @@
 import os
 import sys
+import argparse
 
 # TODO maybe add recursive search option???
 
 file_types = ['.py', '.txt', '.md']
 
-# check the provided args for a directory
-if len(sys.argv) > 1:
-    # if directory provided set it to path
-    if os.path.isdir(sys.argv[1]):
-        path = sys.argv[1]
-    else:
-        print('Error! Please provide a path or no arguments at all')
-        exit()
-else:
-    # if not directory provided set it to cwd
-    path = os.getcwd()
+# create the argument parser
+my_parser = argparse.ArgumentParser(prog='todo-grabber',
+                                    description='List all TODO items in a folder...',
+                                    epilog='Duces! :)')
+
+# add the program arguments
+my_parser.add_argument('-p',
+                       '--path',
+                       metavar='path',
+                       dest='PATH',
+                       type=str,
+                       help="the directory to search for todo's",
+                       default=os.getcwd())
+
+# execute the parse_args() methos
+args = my_parser.parse_args()
+
+# set the path to iterate through
+path = args.PATH
+
+# if no path was supplied then use current directory
+if not os.path.isdir(path):
+    print('Error! Please provide a path or no arguments at all')
+    sys.exit()
 
 # iterate through all items in directory
 for item in os.listdir(path):
