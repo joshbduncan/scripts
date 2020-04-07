@@ -11,13 +11,14 @@ Python 3:
 
 ### Usage Examples:
 
-    python3 todo-grabber.py  
+Iterate through all of the specified files and print out the todo's in the current directory.
 
-Used to iterate through all of the specified files and print out the todo's and line numbers in the current directory.
+    python3 todo-grabber.py
+    
+Iterate through all of the specified files and print out the todo's in the specified directory '-p ~/path'.
 
     python3 todo-grabber.py -p ~/path
 
-Used to iterate through all of the specified files and print out the todo's and line numbers in the specified path '~/path'.
 
 **Output Example:**
 
