@@ -2,8 +2,8 @@
 
 ## Table of Contents
 
-- [Airtable Expenses](#airtable-expenespy)
-- [Todo Grabber](#todo-grabberpy)
+- [Airtable Expenses](#airtable-expenes)
+- [Todo Grabber](#todo-grabber)
 - [The End](#the-end)
 
 Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nam at ex lobortis, commodo odio vitae, euismod lorem. Pellentesque tempor, lacus vel feugiat tincidunt, nibh nisl faucibus augue, in iaculis libero libero eu metus. Vestibulum congue libero massa, id rutrum risus tincidunt ultrices. Cras nunc est, accumsan a varius ut, mollis non mi. Pellentesque sit amet hendrerit massa, at sollicitudin risus. Nulla eget suscipit felis, vel malesuada arcu. Donec vitae massa sed enim tristique maximus et commodo enim. Donec tempor mi vitae viverra pretium. Cras vitae feugiat ante. Duis turpis augue, dapibus quis molestie sit amet, sodales ut tortor. Mauris ultricies, mi vitae tincidunt pretium, odio mauris suscipit nisi, sit amet sagittis nisl lacus nec tortor.
