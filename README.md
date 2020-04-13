@@ -16,10 +16,6 @@ Sed molestie elementum rutrum. Orci varius natoque penatibus et magnis dis partu
 
 Vestibulum venenatis ante at lorem sollicitudin convallis. Fusce vestibulum neque ac odio lacinia fringilla. Ut tristique risus quis arcu convallis, ut convallis est convallis. Nunc non accumsan nibh, non ultricies risus. Etiam mattis, augue in tempor iaculis, quam neque euismod urna, vitae ornare ex ante at ex. Quisque sagittis velit ac dolor pretium consectetur. Donec scelerisque mollis metus a pretium. Aenean maximus purus non justo finibus, eget sollicitudin ex elementum. Mauris maximus, augue vitae tincidunt fermentum, ante ex luctus sem, vel feugiat ligula nisi sit amet justo. Morbi ut vulputate nisl, et finibus leo. Cras elit eros, luctus quis condimentum vitae, lacinia quis neque. Vivamus sit amet elit feugiat, pretium nisl ac, ullamcorper lectus. Donec posuere imperdiet erat at rutrum. In hac habitasse platea dictumst. Sed eu nulla lectus. Praesent porttitor efficitur risus nec vehicula.
 
-## airtable-expenses:
-
-Info to come...
-
 ## todo-grabber:
 
 Search for all todo's (ex. 'TODO') from the specified file types in the current directory, supplied directory '-p', or supplied file '-f'.
@@ -63,5 +59,9 @@ Print out todo's for the specified file '-f file.py'.
 The specified file types are set in the 'file_types' list variable.
 
     file_types = ['.py', '.txt', '.md']
-    
+
+## airtable-expenses:
+
+Info to come...
+
 ## The End
