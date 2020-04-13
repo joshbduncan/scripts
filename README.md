@@ -2,8 +2,8 @@
 
 ## Table of Contents
 
-- [Airtable Expenses](#airtable-expenes)
-- [Todo Grabber](#todo-grabber)
+- [Airtable Expenses](#airtable-expensespy)
+- [Todo Grabber](#todo-grabberpy)
 - [The End](#the-end)
 
 Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nam at ex lobortis, commodo odio vitae, euismod lorem. Pellentesque tempor, lacus vel feugiat tincidunt, nibh nisl faucibus augue, in iaculis libero libero eu metus. Vestibulum congue libero massa, id rutrum risus tincidunt ultrices. Cras nunc est, accumsan a varius ut, mollis non mi. Pellentesque sit amet hendrerit massa, at sollicitudin risus. Nulla eget suscipit felis, vel malesuada arcu. Donec vitae massa sed enim tristique maximus et commodo enim. Donec tempor mi vitae viverra pretium. Cras vitae feugiat ante. Duis turpis augue, dapibus quis molestie sit amet, sodales ut tortor. Mauris ultricies, mi vitae tincidunt pretium, odio mauris suscipit nisi, sit amet sagittis nisl lacus nec tortor.
@@ -16,7 +16,11 @@ Sed molestie elementum rutrum. Orci varius natoque penatibus et magnis dis partu
 
 Vestibulum venenatis ante at lorem sollicitudin convallis. Fusce vestibulum neque ac odio lacinia fringilla. Ut tristique risus quis arcu convallis, ut convallis est convallis. Nunc non accumsan nibh, non ultricies risus. Etiam mattis, augue in tempor iaculis, quam neque euismod urna, vitae ornare ex ante at ex. Quisque sagittis velit ac dolor pretium consectetur. Donec scelerisque mollis metus a pretium. Aenean maximus purus non justo finibus, eget sollicitudin ex elementum. Mauris maximus, augue vitae tincidunt fermentum, ante ex luctus sem, vel feugiat ligula nisi sit amet justo. Morbi ut vulputate nisl, et finibus leo. Cras elit eros, luctus quis condimentum vitae, lacinia quis neque. Vivamus sit amet elit feugiat, pretium nisl ac, ullamcorper lectus. Donec posuere imperdiet erat at rutrum. In hac habitasse platea dictumst. Sed eu nulla lectus. Praesent porttitor efficitur risus nec vehicula.
 
-## todo-grabber:
+## airtable-expenses.py:
+
+Info to come...
+
+## todo-grabber.py:
 
 Search for all todo's (ex. 'TODO') from the specified file types in the current directory, supplied directory '-p', or supplied file '-f'.
 
@@ -59,9 +63,5 @@ Print out todo's for the specified file '-f file.py'.
 The specified file types are set in the 'file_types' list variable.
 
     file_types = ['.py', '.txt', '.md']
-
-## airtable-expenses:
-
-Info to come...
 
 ## The End
