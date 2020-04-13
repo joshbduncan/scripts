@@ -2,7 +2,7 @@
 
 ## todo-grabber.py:
 
-Search for all todo's (ex. 'TODO') from the specified file types in the current directory, or any directory if supplied in the arguments.
+Search for all todo's (ex. 'TODO') from the specified file types in the current directory, supplied directory '-p', or supplied file '-f'.
 
 Python 3:  
 - [os module](https://docs.python.org/3/library/os.html)
@@ -11,15 +11,15 @@ Python 3:
 
 ### Usage Examples:
 
-Iterate through all of the specified files and print out the todo's in the current directory.
+Iterate through all of the files in the current directory and print out the todo's.
 
     python3 todo-grabber.py
 
-Iterate through all of the specified files and print out the todo's in the specified directory '-p ~/path'.
+Iterate through all of the files in the specified directory '-p ~/path' and print out the todo's .
 
     python3 todo-grabber.py -p ~/path
 
-Only show todo's for a specified files '-f file.py'.
+Print out todo's for the specified file '-f file.py'.
 
     python3 todo-grabber.py -f ~/path/file.py
 
@@ -38,3 +38,8 @@ Only show todo's for a specified files '-f file.py'.
     > TODO reconfigure check_for_dupe (88)
     > TODO check for any available items (160)
 
+### Specified File Types
+
+The specified file types are set in the 'file_types' list variable.
+
+    file_types = ['.py', '.txt', '.md']
