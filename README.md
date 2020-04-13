@@ -15,13 +15,13 @@ Iterate through all of the specified files and print out the todo's in the curre
 
     python3 todo-grabber.py
 
-Only show todo's for a specified files '-f file.py'.
-
-    python3 todo-grabber.py -f ~/path/file.py
-    
 Iterate through all of the specified files and print out the todo's in the specified directory '-p ~/path'.
 
     python3 todo-grabber.py -p ~/path
+
+Only show todo's for a specified files '-f file.py'.
+
+    python3 todo-grabber.py -f ~/path/file.py
 
 
 **Output Example:**

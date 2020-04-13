@@ -53,16 +53,10 @@ file_types = ['.py', '.txt', '.md']
 
 # create the argument parser
 my_parser = argparse.ArgumentParser(prog='todo-grabber',
-                                    description='List all TODO items in a folder...',
+                                    description='List all TODO items...',
                                     epilog='Duces! :)')
 
 # add the program arguments
-my_parser.add_argument('-a',
-                       '--all',
-                       action="store_true",
-                       dest='ALL',
-                       help="show all todo's from the current directory")
-
 my_parser.add_argument('-f',
                        '--file',
                        metavar='file',
@@ -77,16 +71,24 @@ my_parser.add_argument('-p',
                        type=str,
                        help="the directory to search for todo's")
 
-# execute the parse_args() methos
+# execute the parse_args() method
 args = my_parser.parse_args()
 
 # set the path to iterate through
-all_file = args.ALL
 file = args.FILE
 path = args.PATH
 
-if all_file or path:
-    # if no path was supplied then use current directory
+if file:
+    path = file
+    # if path to file was provided check and see if it's an actual path to a file
+    if not os.path.isfile(path):
+        print(f"No such file or directory: '{path}'")
+        sys.exit()
+
+    get_todos_from_file(file)
+
+else:
+    # if no arguments are supplied then use current directory
     if not path:
         path = os.getcwd()
 
@@ -101,12 +103,3 @@ if all_file or path:
         item_path = f'{path}/{item}'
 
         get_todos_from_file(item_path)
-
-elif file:
-    path = file
-    # if path to file was provided check and see if it's an actual path to a file
-    if not os.path.isfile(path):
-        print(f"No such file or directory: '{path}'")
-        sys.exit()
-
-    get_todos_from_file(file)
