@@ -16,6 +16,7 @@ import secrets
 
 # TODO no expenses exist
 # TODO no expenses to mark submitted
+# TODO cleanup the mess
 
 
 # import secrets and set variables
