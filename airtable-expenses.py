@@ -14,7 +14,6 @@ import airtable
 import secrets
 
 
-# TODO limit expense marking by end date
 # TODO add some error catching
 
 
@@ -44,27 +43,40 @@ def conn_airtbale():
     return conn
 
 
-def download_pdfs(expenses, tmp_dir):
+def cleanup_date(date):
+    # set end date for expense report
+    try:
+        year = int(date.split('-')[0])
+        month = int(date.split('-')[1])
+        day = int(date.split('-')[2])
+        exp_date = datetime(year, month, day)
+    except:
+        print('Not a valid date! Pleas change date and run again.')
+        sys.exit()
+
+    return exp_date
+
+
+def download_pdfs(expenses, tmp_dir, exp_date):
     # download all pdf receipts from airtable url
     print(f'Downloading {len(expenses)} receipt(s)...')
 
     for expense in expenses:
-        exp_id = expense['id']
-        file_path = f'{tmp_dir}/{exp_id}.pdf'
-        url = expense['fields']['Receipt'][0]['url']
-        receipt = requests.get(url)
+        if datetime.strptime(expense['fields']['Date'], '%Y-%m-%d') <= exp_date:
+            exp_id = expense['id']
+            file_path = f'{tmp_dir}/{exp_id}.pdf'
+            url = expense['fields']['Receipt'][0]['url']
+            receipt = requests.get(url)
 
-        with open(file_path, 'wb') as f:
-            f.write(receipt.content)
-
-    return tmp_dir
+            with open(file_path, 'wb') as f:
+                f.write(receipt.content)
 
 
 def create_df(data, exp_date):
     # create a pandas dataframe to hold the data
     df = pd.DataFrame()
 
-    # setup lists for found record(s) info
+    # setup lists for found expense(s) info
     dates = []
     descriptions = []
     companies = []
@@ -72,13 +84,13 @@ def create_df(data, exp_date):
     amounts = []
 
     # iterate through expenses insert data into lists
-    for record in data:
-        if datetime.strptime(record['fields']['Date'], '%Y-%m-%d') <= exp_date:
-            dates.append(record['fields']['Date'])
-            companies.append(record['fields']['Card'])
-            vendors.append(record['fields']['Vendor'])
-            descriptions.append(record['fields']['Description'])
-            amounts.append(record['fields']['Amount'])
+    for expense in data:
+        if datetime.strptime(expense['fields']['Date'], '%Y-%m-%d') <= exp_date:
+            dates.append(expense['fields']['Date'])
+            companies.append(expense['fields']['Card'])
+            vendors.append(expense['fields']['Vendor'])
+            descriptions.append(expense['fields']['Description'])
+            amounts.append(expense['fields']['Amount'])
 
     # fill in the Pandas dataframe
     df['Date'] = dates
@@ -120,7 +132,7 @@ def create_pdf(table, exp_date, tmp_dir):
     pdf.output(path, 'F')
 
 
-def mark_expense():
+def mark_expense(exp_date):
     # mark all current expenses on airtable as "submitted"
     # should be ran with the -m flag after creating a report
     try:
@@ -132,13 +144,14 @@ def mark_expense():
             sys.exit()
         else:
             for expense in current_exp:
-                exp_id = expense['id']
-                exp_name = expense['fields']['Description']
+                if datetime.strptime(expense['fields']['Date'], '%Y-%m-%d') <= exp_date:
+                    exp_id = expense['id']
+                    exp_name = expense['fields']['Description']
 
-                print(f'Marking expense {exp_name} as submitted...')
+                    print(f'Marking expense {exp_name} as submitted...')
 
-                fields = {'Submitted': True}
-                table.update(exp_id, fields)
+                    fields = {'Submitted': True}
+                    table.update(exp_id, fields)
 
             print('Done!')
     except:
@@ -162,13 +175,17 @@ my_parser.add_argument('-d',
 
 my_parser.add_argument('-m',
                        '--mark',
-                       action="store_true",
+                       metavar='mark',
                        dest='MARK',
-                       help="mark expenses as submitted"
-                       )
+                       type=str,
+                       help="mark expenses as submitted up until this date (ex. 2000-01-01)")
 
 # parse the provided args
 args = my_parser.parse_args()
+
+# testing input
+# print(args)
+# sys.exit()
 
 # set variables from provided args
 date = args.DATE
@@ -176,14 +193,7 @@ mark = args.MARK
 
 if date:
     # set end date for expense report
-    try:
-        year = int(date.split('-')[0])
-        month = int(date.split('-')[1])
-        day = int(date.split('-')[2])
-        exp_date = datetime(year, month, day)
-    except:
-        print('Not a valid date! Pleas change date and run again.')
-        sys.exit()
+    exp_date = cleanup_date(date)
 
     formatted_exp_date = exp_date.strftime('%Y-%m-%d')
 
@@ -196,7 +206,7 @@ if date:
 
     print(f'Fetching all open expenses until {date}...')
     table = conn_airtbale()
-    current_exp = table.get_all(view='Current Expenses', sort='Date')
+    current_exp = table.get_all(view='CA - Open Expenses', sort='Date')
 
     if current_exp == []:
         print('There are no expenses to report... Exiting!')
@@ -211,7 +221,7 @@ if date:
 
     create_pdf(tab_table, exp_date, tmp_dir)
 
-    download_pdfs(current_exp, tmp_dir)
+    download_pdfs(current_exp, tmp_dir, exp_date)
 
     # merge report and receipts
     merger = PyPDF2.PdfFileMerger()
@@ -249,6 +259,9 @@ if date:
     applescript.run(as_path)
 
 if mark:
-    mark_expense()
+    # set end date for marked expenses
+    exp_date = cleanup_date(mark)
+
+    mark_expense(exp_date)
 
 sys.exit()
