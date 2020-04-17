@@ -14,9 +14,8 @@ import airtable
 import secrets
 
 
-# TODO no expenses exist
-# TODO no expenses to mark submitted
-# TODO cleanup the mess
+# TODO limit expense marking by end date
+# TODO add some error catching
 
 
 # import secrets and set variables
@@ -28,24 +27,25 @@ AIRTABLE_TABLE = secrets.AIRTABLE_TABLE
 
 
 def write_to_clipboard(output):
-    # Write to clipboard for Applescript function
+    # write to clipboard for applescript function
     process = subprocess.Popen(
         'pbcopy', env={'LANG': 'en_US.UTF-8'}, stdin=subprocess.PIPE)
     process.communicate(output.encode('utf-8'))
 
 
 def conn_airtbale():
+    # create a connection to the airtable base
     try:
         conn = airtable.Airtable(
             AIRTABLE_BASE, AIRTABLE_TABLE, api_key=AIRTABLE_KEY)
     except:
-        print("Error! Couldn't connect to Airtable")
+        print("Error! Couldn't connect to Airtable.")
 
     return conn
 
 
 def download_pdfs(expenses, tmp_dir):
-
+    # download all pdf receipts from airtable url
     print(f'Downloading {len(expenses)} receipt(s)...')
 
     for expense in expenses:
@@ -61,45 +61,45 @@ def download_pdfs(expenses, tmp_dir):
 
 
 def create_df(data, exp_date):
-    # Setup Pandas dataframe
+    # create a pandas dataframe to hold the data
     df = pd.DataFrame()
 
-    # Setup lists for found record(s) info
+    # setup lists for found record(s) info
     dates = []
     descriptions = []
     companies = []
     vendors = []
     amounts = []
 
-    # Iterate through found record(s) and insert data into lists
+    # iterate through expenses insert data into lists
     for record in data:
         if datetime.strptime(record['fields']['Date'], '%Y-%m-%d') <= exp_date:
             dates.append(record['fields']['Date'])
-            companies.append(record['fields']['Company (Card)'])
+            companies.append(record['fields']['Card'])
             vendors.append(record['fields']['Vendor'])
             descriptions.append(record['fields']['Description'])
             amounts.append(record['fields']['Amount'])
 
-    # Fill in the Pandas dataframe
+    # fill in the Pandas dataframe
     df['Date'] = dates
     df['Description'] = descriptions
     df['Company (Card)'] = companies
     df['Vendor'] = vendors
     df['Amount'] = amounts
 
-    # Add in a total line
+    # add in a total line
     df.loc['Total'] = pd.Series(df['Amount'].sum(), index=['Amount'])
-    total = df['Amount'].sum()
+    # total = df['Amount'].sum()
 
     return df
 
 
 def create_pdf(table, exp_date, tmp_dir):
-    # Format data and set PDF filename and output path
+    # format data and set PDF filename and output path
     formatted_exp_date = exp_date.strftime('%Y-%m-%d')
     path = f'{tmp_dir}/1.pdf'
 
-    # Setup PDF page and add in info
+    # setup PDF page and add in info
     print('Creating expense report...')
     pdf = FPDF('L', 'in', 'Letter')
 
@@ -116,17 +116,20 @@ def create_pdf(table, exp_date, tmp_dir):
         pdf.cell(0, .5, line, align='C')
         pdf.ln(h=.1875)
 
-    # Output the final PDF and open it up in Preview
+    # output the final PDF report file
     pdf.output(path, 'F')
 
 
 def mark_expense():
+    # mark all current expenses on airtable as "submitted"
+    # should be ran with the -m flag after creating a report
     try:
         table = conn_airtbale()
-        current_exp = table.get_all(view='Current Expenses', sort='Date')
+        current_exp = table.get_all(view='CA - Open Expenses', sort='Date')
 
         if current_exp == []:
-            print('There are no current expenses to mark!')
+            print('There are no expenses to mark... Exiting!')
+            sys.exit()
         else:
             for expense in current_exp:
                 exp_id = expense['id']
@@ -164,15 +167,15 @@ my_parser.add_argument('-m',
                        help="mark expenses as submitted"
                        )
 
-# execute the parse_args() methos
+# parse the provided args
 args = my_parser.parse_args()
 
-# set the path to iterate through
+# set variables from provided args
 date = args.DATE
 mark = args.MARK
 
 if date:
-    # Set end date for expense report
+    # set end date for expense report
     try:
         year = int(date.split('-')[0])
         month = int(date.split('-')[1])
@@ -180,23 +183,29 @@ if date:
         exp_date = datetime(year, month, day)
     except:
         print('Not a valid date! Pleas change date and run again.')
-        exit()
+        sys.exit()
 
     formatted_exp_date = exp_date.strftime('%Y-%m-%d')
-    tmp_dir = tempfile.mkdtemp()
-    report_name = f'Expense Report - Josh Duncan - {formatted_exp_date}.pdf'
-    report_path = f'/Users/jbd/Dropbox/Carolina Apothecary/Documents/Expense Reports/{report_name}'
 
-    # print(tmp_dir)
+    # make a temp directory to work from
+    tmp_dir = tempfile.mkdtemp()
+
+    # setup report file name and storage info
+    report_name = f'Expense Report - Josh Duncan - {formatted_exp_date}.pdf'
+    report_path = f'/Users/jbd/Dropbox/Documents/Carolina Apothecary/Expense Reports/{report_name}'
 
     print(f'Fetching all open expenses until {date}...')
-
     table = conn_airtbale()
     current_exp = table.get_all(view='Current Expenses', sort='Date')
 
+    if current_exp == []:
+        print('There are no expenses to report... Exiting!')
+        sys.exit()
+
+    # put airtable info into pandas dataframe
     df = create_df(current_exp, exp_date)
 
-    # Generate the final table for output
+    # generate the final table for output
     tab_table = tabulate(df, headers='keys', tablefmt='psql', showindex=False,
                          floatfmt='.2f').replace('nan  ', 'Total', 1).replace('nan', '   ')
 
@@ -207,32 +216,35 @@ if date:
     # merge report and receipts
     merger = PyPDF2.PdfFileMerger()
 
+    # grab a list of all files in the temp directory
     files = sorted([file for file in os.listdir(tmp_dir)])
 
     for file in files:
-        # print(file)
         file_path = f'{tmp_dir}/{file}'
-
-        merger.append(file_path)
+        merger.append(file_path, import_bookmarks=False)
+        # delete the receipts file after appending
         os.remove(file_path)
 
+    # save the final report with attached receipts
     merger.write(report_path)
 
+    # delete the temp directory
     os.removedirs(tmp_dir)
 
     print('Cleaning up...')
     print('Report created!')
 
+    # open the report to check for correctness
     subprocess.call(['open', report_path])
 
-    # Save the date to the clipboard for the Applescript
+    # save the date to the clipboard for the Applescript
     write_to_clipboard(f'{date},{report_path}')
 
-    # Open receipts folder
-    receipts_path = f'/Users/jbd/Dropbox/Carolina Apothecary/Documents/Expense Reports/Receipts'
-    subprocess.call(['open', receipts_path])
+    # open receipts folder
+    # receipts_path = '/Users/jbd/Dropbox/Documents/Receipts'
+    # subprocess.call(['open', receipts_path])
 
-    # Run the Outlook Message Applescript
+    # run the Outlook Message Applescript and attached report
     as_path = '/Users/jbd/Library/Scripts/Expense Report.scpt'
     applescript.run(as_path)
 
