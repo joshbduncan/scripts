@@ -164,14 +164,13 @@ my_parser = argparse.ArgumentParser(prog='airtable-expense-grabber',
                                     description='Grab all open expenses from Airtable...',
                                     epilog='Duces! :)')
 
-
 # add the program arguments
-my_parser.add_argument('-d',
-                       '--date',
-                       metavar='date',
-                       dest='DATE',
+my_parser.add_argument('-l',
+                       '--list',
+                       metavar='list',
+                       dest='LIST',
                        type=str,
-                       help="grab expenses up until this date (ex. 2000-01-01)")
+                       help="downloaded expenses up until this date (ex. 2000-01-01)")
 
 my_parser.add_argument('-m',
                        '--mark',
@@ -183,12 +182,17 @@ my_parser.add_argument('-m',
 # parse the provided args
 args = my_parser.parse_args()
 
+# if no args provided
+if not args.LIST and not args.MARK:
+    print('No arguments provided! Use expenses -h for help.')
+    sys.exit()
+
 # testing input
 # print(args)
 # sys.exit()
 
 # set variables from provided args
-date = args.DATE
+date = args.LIST
 mark = args.MARK
 
 if date:
@@ -215,48 +219,64 @@ if date:
     # put airtable info into pandas dataframe
     df = create_df(current_exp, exp_date)
 
-    # generate the final table for output
+    # generate the final table for output and print to screen
     tab_table = tabulate(df, headers='keys', tablefmt='psql', showindex=False,
                          floatfmt='.2f').replace('nan  ', 'Total', 1).replace('nan', '   ')
+    print(tab_table)
 
-    create_pdf(tab_table, exp_date, tmp_dir)
+    # would you like to download the final report
+    print('\n')
+    cont = input(
+        'Would you like to download your final expense report? (y/n): ').lower()
+    if cont != 'y':
+        sys.exit()
+    else:
+        create_pdf(tab_table, exp_date, tmp_dir)
+        download_pdfs(current_exp, tmp_dir, exp_date)
 
-    download_pdfs(current_exp, tmp_dir, exp_date)
+        # merge report and receipts
+        merger = PyPDF2.PdfFileMerger()
 
-    # merge report and receipts
-    merger = PyPDF2.PdfFileMerger()
+        # grab a list of all files in the temp directory
+        files = sorted([file for file in os.listdir(tmp_dir)])
 
-    # grab a list of all files in the temp directory
-    files = sorted([file for file in os.listdir(tmp_dir)])
+        for file in files:
+            file_path = f'{tmp_dir}/{file}'
+            merger.append(file_path, import_bookmarks=False)
+            # delete the receipts file after appending
+            os.remove(file_path)
 
-    for file in files:
-        file_path = f'{tmp_dir}/{file}'
-        merger.append(file_path, import_bookmarks=False)
-        # delete the receipts file after appending
-        os.remove(file_path)
+        # save the final report with attached receipts
+        merger.write(report_path)
 
-    # save the final report with attached receipts
-    merger.write(report_path)
+        # delete the temp directory
+        os.removedirs(tmp_dir)
 
-    # delete the temp directory
-    os.removedirs(tmp_dir)
+        print('Cleaning up...')
+        print('Report created!')
 
-    print('Cleaning up...')
-    print('Report created!')
+        # open the report to check for correctness
+        subprocess.call(['open', report_path])
 
-    # open the report to check for correctness
-    subprocess.call(['open', report_path])
+        # save the date to the clipboard for the Applescript
+        write_to_clipboard(f'{date},{report_path}')
 
-    # save the date to the clipboard for the Applescript
-    write_to_clipboard(f'{date},{report_path}')
+        # open receipts folder
+        # receipts_path = '/Users/jbd/Dropbox/Documents/Receipts'
+        # subprocess.call(['open', receipts_path])
 
-    # open receipts folder
-    # receipts_path = '/Users/jbd/Dropbox/Documents/Receipts'
-    # subprocess.call(['open', receipts_path])
+        # run the Outlook Message Applescript and attached report
+        as_path = '/Users/jbd/Library/Scripts/Expense Report.scpt'
+        applescript.run(as_path)
 
-    # run the Outlook Message Applescript and attached report
-    as_path = '/Users/jbd/Library/Scripts/Expense Report.scpt'
-    applescript.run(as_path)
+    # would you like to go ahead and mark all expenses as submitted
+    print('\n')
+    cont = input(
+        'Would you mark all current expenses as submitted? (y/n): ').lower()
+    if cont != 'y':
+        sys.exit()
+    else:
+        mark = args.LIST
 
 if mark:
     # set end date for marked expenses

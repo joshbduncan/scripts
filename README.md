@@ -34,7 +34,7 @@ Requirements:
 
 Grab all "unsubmitted" work expenses from Airtable up until the date specified and generate a report.
 
-    python3 airtable-expenses.py -d 2000-01-01
+    python3 airtable-expenses.py -l 2000-01-01
 
 Mark all "unsubmitted" work expenses in Airtable up to the date provided as submitted.
 
