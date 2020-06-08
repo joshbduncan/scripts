@@ -49,7 +49,7 @@ def get_todos_from_file(path):
             print('')
 
 
-file_types = ['.py', '.txt', '.md']
+file_types = ['.py', '.sh', '.txt', '.md']
 
 # create the argument parser
 my_parser = argparse.ArgumentParser(prog='todo-grabber',
@@ -80,7 +80,7 @@ path = args.PATH
 
 if file:
     path = file
-    # if path to file was provided check and see if it's an actual path to a file
+    # if path was provided check and see if it's an actual path to a file
     if not os.path.isfile(path):
         print(f"No such file or directory: '{path}'")
         sys.exit()

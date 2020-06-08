@@ -98,4 +98,4 @@ Print out todo's for the specified file '-f file.py'.
 
 The specified file types are set in the 'file_types' list variable.
 
-    file_types = ['.py', '.txt', '.md']
+    file_types = ['.py', '.sh', '.txt', '.md']
