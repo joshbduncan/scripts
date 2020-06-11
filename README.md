@@ -32,13 +32,13 @@ Requirements:
 
 ### Usage Examples:
 
-Grab all "unsubmitted" work expenses from Airtable up until the date specified and generate a report.
+Grab all "unsubmitted" work expenses from Airtable.
 
-    python3 airtable-expenses.py -l 2000-01-01
+    python3 airtable-expenses.py
 
-Mark all "unsubmitted" work expenses in Airtable up to the date provided as submitted.
+Grab all "unsubmitted" work expenses from Airtable up until the date specified.
 
-    python3 airtable-expenses.py -m 2000-01-01
+    python3 airtable-expenses.py -d 2020-01-01
 
 ### Airtable Base: Receipts
 

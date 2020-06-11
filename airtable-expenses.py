@@ -144,7 +144,7 @@ def mark_expense(exp_date):
         current_exp = table.get_all(view='CA - Open Expenses', sort='Date')
 
         if current_exp == []:
-            print('There are no expenses to mark... Exiting!')
+            print('There are no expenses to mark! Bye...')
             sys.exit()
         else:
             for expense in current_exp:
@@ -169,35 +169,22 @@ my_parser = argparse.ArgumentParser(prog='airtable-expense-grabber',
                                     epilog='Duces! :)')
 
 # add the program arguments
-my_parser.add_argument('-l',
-                       '--list',
-                       metavar='list',
-                       dest='LIST',
+my_parser.add_argument('-d',
+                       '--date',
+                       metavar='date',
+                       dest='DATE',
                        type=str,
-                       help="downloaded expenses up until this date (ex. 2000-01-01)")
-
-my_parser.add_argument('-m',
-                       '--mark',
-                       metavar='mark',
-                       dest='MARK',
-                       type=str,
-                       help="mark expenses as submitted up until this date (ex. 2000-01-01)")
+                       help="show open expenses up until this date (ex. 2000-01-01)")
 
 # parse the provided args
 args = my_parser.parse_args()
 
 # if no args provided
-if not args.LIST and not args.MARK:
-    print('No arguments provided! Use expenses -h for help.')
-    sys.exit()
-
-# testing input
-# print(args)
-# sys.exit()
-
-# set variables from provided args
-date = args.LIST
-mark = args.MARK
+if not args.DATE:
+    date = datetime.today().strftime('%Y-%m-%d')
+else:
+    # set variables from provided args
+    date = args.DATE
 
 if date:
     # set end date for expense report
@@ -280,12 +267,7 @@ if date:
     if cont != 'y':
         sys.exit()
     else:
-        mark = args.LIST
-
-if mark:
-    # set end date for marked expenses
-    exp_date = cleanup_date(mark)
-
-    mark_expense(exp_date)
+        mark = args.DATE
+        mark_expense(exp_date)
 
 sys.exit()
