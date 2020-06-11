@@ -39,7 +39,7 @@ def conn_airtbale():
             AIRTABLE_BASE, AIRTABLE_TABLE, api_key=AIRTABLE_KEY)
     except:
         print("Error! Couldn't connect to Airtable.")
-
+        sys.exit()
     return conn
 
 
@@ -61,15 +61,19 @@ def download_pdfs(expenses, tmp_dir, exp_date):
     # download all pdf receipts from airtable url
     print(f'Downloading {len(expenses)} receipt(s)...')
 
-    for expense in expenses:
-        if datetime.strptime(expense['fields']['Date'], '%Y-%m-%d') <= exp_date:
-            exp_id = expense['id']
-            file_path = f'{tmp_dir}/{exp_id}.pdf'
-            url = expense['fields']['Receipt'][0]['url']
-            receipt = requests.get(url)
+    try:
+        for expense in expenses:
+            if datetime.strptime(expense['fields']['Date'], '%Y-%m-%d') <= exp_date:
+                exp_id = expense['id']
+                file_path = f'{tmp_dir}/{exp_id}.pdf'
+                url = expense['fields']['Receipt'][0]['url']
+                receipt = requests.get(url)
 
-            with open(file_path, 'wb') as f:
-                f.write(receipt.content)
+                with open(file_path, 'wb') as f:
+                    f.write(receipt.content)
+    except:
+        print('Error downloading receipt(s)! Try again later.')
+        sys.exit()
 
 
 def create_df(data, exp_date):
